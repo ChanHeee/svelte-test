@@ -7,9 +7,7 @@
   let cal = '+';
 
   $: disabled = !input;
-  $: console.log(input, cal);
   $: $balance = $income + $expenses;
-  $: console.log('-----------', $transaction.length);
 
   const incomeFunc = () => {
     $income = $income + input;
@@ -28,6 +26,17 @@
       expensesFunc();
       input = 0;
     }
+  };
+
+  const removeTransaction = (event) => {
+    const id = event.target.id;
+    const { mode, value } = $transaction[id];
+    if (mode == 'income') {
+      $income = $income - value;
+    } else {
+      $expenses = $expenses - value;
+    }
+    $transaction = $transaction.filter((t, idx) => id != idx);
   };
 </script>
 
@@ -63,8 +72,13 @@
   <hr class="h-0.5" />
 
   {#if $transaction.length > 0}
-    {#each $transaction as t}
-      <Transaction mode={t.mode} value={t.value} />
+    {#each $transaction as t, i}
+      <Transaction
+        mode={t.mode}
+        value={t.value}
+        removeTransaction={removeTransaction}
+        index={i}
+      />
     {/each}
   {/if}
 </div>
